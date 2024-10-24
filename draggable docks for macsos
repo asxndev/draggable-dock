@@ -1,0 +1,115 @@
+import 'package:flutter/material.dart';
+
+
+void main() {
+  runApp(const MyApp());
+}
+
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Dock(
+            items: const [
+              Icons.person,
+              Icons.message,
+              Icons.call,
+              Icons.camera,
+              Icons.photo,
+            ],
+            builder: (icon) {
+              return Container(
+                constraints: const BoxConstraints(minWidth: 48),
+                height: 48,
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.primaries[icon.hashCode % Colors.primaries.length],
+                ),
+                child: Center(child: Icon(icon, color: Colors.white)),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Dock of the reorderable items.
+class Dock extends StatefulWidget {
+  const Dock({
+    super.key,
+    this.items = const [],
+    required this.builder,
+  });
+
+  /// Initial items to put in this Dock.
+  final List<IconData> items;
+
+  /// Builder building the provided item.
+  final Widget Function(IconData) builder;
+
+  @override
+  State<Dock> createState() => _DockState();
+}
+
+/// State of the Dock used to manipulate the items.
+class _DockState extends State<Dock> {
+  late List<IconData> _items;
+
+  @override
+  void initState() {
+    super.initState();
+    _items = List.from(widget.items); // Create a mutable copy of the items.
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.black12,
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: _items.asMap().entries.map((entry) {
+          int index = entry.key;
+          IconData item = entry.value;
+
+          return DragTarget<IconData>(
+            builder: (context, candidateData, rejectedData) {
+              return Draggable<IconData>(
+                data: item,
+                feedback: Material(
+                  color: Colors.transparent,
+                  child: widget.builder(item),
+                ),
+                childWhenDragging: Container(),
+                child: widget.builder(item),
+              );
+            },
+            onAccept: (data) {
+              setState(() {
+                // Get the index of the dragged item
+                int fromIndex = _items.indexOf(data);
+                // Swap items if they are different
+                if (fromIndex != index) {
+                  IconData temp = _items[index];
+                  _items[index] = data;
+                  _items[fromIndex] = temp;
+                }
+              });
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
