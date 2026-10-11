@@ -1,6 +1,9 @@
 # draggable-dock
 
 
+
+ Error --> The SDK Manager CLI tool (sdkmanager) is deprecated. Android CLI will be used instead.
+error comes when run - flutter doctor -v then -> flutter doctor --android-licenses"
 1. Open Android Studio.
 2. Navigate to Tools > SDK Manager (or Settings > Languages & Frameworks > Android SDK).
 3. Select the SDK Tools tab.
